@@ -1,0 +1,209 @@
+body {
+  /* CSS Variables for Liquid Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.06); /* Very subtle white background */
+  --glass-border: none; /* No border for text boxes */
+  --glass-blur: 10px; /* Stronger blur for more prominent effect */
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+  --glass-highlight: rgba(255, 255, 255, 0.03); /* For subtle gradients */
+  --text-color: #f0f0f0; /* Brighter default text */
+  --title-color: #c9e8ff; /* A slightly brighter, clearer blue for titles */
+
+  font-family: "Lora", serif;
+  background-color: rgb(32, 32, 32); /* Dark mode Chrome background */
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* Prevent scrollbars */
+  color: var(--text-color);
+  font-style: italic; /* Make all body text italic */
+  font-weight: 400; /* Set font weight to regular */
+  font-size: 16px; /* Set base font size to 16px */
+}
+
+#background-image-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background-image is set via CSS variable on ::before */
+  z-index: 0;
+}
+
+#background-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--image-url); /* Use CSS variable */
+  background-size: cover; /* Ensure blurred background covers the entire area */
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Ensures background stays fixed relative to viewport */
+  filter: blur(10px) brightness(60%) contrast(110%); /* Apply blur and other filters here */
+  transform: scale(1.1); /* Scale up to fix white border around blurred background */
+  z-index: 0;
+}
+
+#sharp-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--image-url); /* Use CSS variable */
+  background-size: cover; /* Sharp image covers the entire area */
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Ensures background stays fixed relative to viewport */
+  filter: brightness(100%) contrast(100%); /* Ensure sharpness */
+  z-index: 1; /* Place above blurred background */
+  opacity: 1; /* Always visible instantly */
+  display: none; /* Hidden by default, shown by JS when it's an image */
+}
+
+#background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure video covers the entire area */
+  z-index: 1; /* Same as sharp-image */
+  display: none; /* Hidden by default, shown by JS when it's a video */
+}
+
+.content-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Push content to the bottom right */
+  justify-content: flex-end; /* Push content to the bottom right */
+  z-index: 2; /* Ensure it's on top of both image layers */
+  /* No padding-bottom here, container margin will handle spacing */
+}
+
+#date-navigation-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%); /* Enhanced liquid glass effect */
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 10px 15px;
+  border-radius: 12px; /* Consistent border radius */
+  color: var(--text-color);
+  font-size: 16px;
+  z-index: 3;
+  transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow for contrast */
+}
+
+#date-navigation-container .arrow {
+  cursor: pointer;
+  font-size: 16px; /* Match date font size for consistent height */
+  padding: 0 5px;
+  user-select: none; /* Prevent text selection on double click */
+  transition: color 0.2s ease-in-out; /* Smooth transition for hover */
+}
+
+#date-navigation-container .arrow:hover {
+  color: rgba(255, 255, 255, 0.8); /* Brighter, more neutral highlight */
+}
+
+.disabled-arrow {
+  color: rgba(255, 255, 255, 0.3) !important; /* Muted color for disabled state */
+  cursor: default !important; /* Indicate non-clickability */
+  pointer-events: none; /* Ensure no click events */
+}
+
+.container {
+  text-align: right; /* Align text to the right within the container */
+  padding: 10px 15px;
+  background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%); /* Enhanced liquid glass effect */
+  border-radius: 12px; /* Consistent border radius */
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  max-width: calc(50vw - 20px);
+  margin: 20px;
+  transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+}
+
+#potd-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: var(--text-color); /* Use consistent text color */
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow for contrast */
+  font-size: 16px;
+  font-weight: normal; /* Make title font weight consistent with date */
+  line-height: 1.2; /* Explicit line height for consistent rendering */
+  cursor: pointer; /* Indicate clickability */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 1.2em; /* Initial height to show one line */
+  transition: max-height 0.5s ease-in-out; /* Smooth transition for max-height only */
+}
+
+#potd-title.expanded {
+  white-space: normal; /* Allow text to wrap */
+  overflow: visible; /* Show full content */
+  text-overflow: clip; /* Remove ellipsis */
+  max-height: 500px; /* Or a sufficiently large value to show full content */
+}
+
+#potd-title a {
+  color: inherit; /* Inherit the color from #potd-title */
+  text-decoration: none; /* Remove underline */
+}
+
+#potd-title a:hover {
+  text-decoration: underline; /* Add underline on hover for discoverability */
+}
+
+/* Ensure no leading margin/padding on the first child element within potd-title */
+#potd-title > *:first-child {
+  margin-left: 0;
+  padding-left: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+
+
+
+#settings {
+  position: absolute; /* Position settings independently */
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%); /* Enhanced liquid glass effect */
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 10px;
+  border-radius: 12px; /* Consistent border radius */
+  z-index: 3; /* Ensure it's on top of everything */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+}
+
+#settings label {
+  color: #e0e0e0; /* Use new body color */
+}
+
+#settings input[type="checkbox"] {
+  margin-right: 5px;
+}
