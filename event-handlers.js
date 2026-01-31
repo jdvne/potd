@@ -1,7 +1,26 @@
 import { arrowLeftElement, arrowRightElement, potdTitleElement, potdContainerElement, sharpImageElement } from "./dom-elements.js";
-import { navigateDate } from "./date-utils.js";
-import { currentArticleUrl, currentPotdData, displayingDate } from "./state.js";
-import { startBackgroundAutoscroll } from "./media-display.js";
+import { navigateDate, updateDisplayingDate } from "./date-utils.js";
+import { currentArticleUrl, currentPotdData, displayingDate, feedMode, setFeedMode } from "./state.js";
+import { startBackgroundAutoscroll, fetchPictureOfTheDay } from "./media-display.js";
+import { wikipediaButton, wikimediaButton } from "./dom-elements.js";
+
+
+function updateFeedButtonsState(activeMode) {
+  if (wikipediaButton) {
+    if (activeMode === "wikipedia") {
+      wikipediaButton.classList.add("active");
+    } else {
+      wikipediaButton.classList.remove("active");
+    }
+  }
+  if (wikimediaButton) {
+    if (activeMode === "wikimedia") {
+      wikimediaButton.classList.add("active");
+    } else {
+      wikimediaButton.classList.remove("active");
+    }
+  }
+}
 
 export function setupEventListeners() {
   // Add keyboard event listener for arrow keys
@@ -44,6 +63,29 @@ export function setupEventListeners() {
     });
   }
 
+  // Event listeners for feed selection buttons
+  if (wikipediaButton) {
+    wikipediaButton.addEventListener("click", () => {
+      if (feedMode !== "wikipedia") {
+        setFeedMode("wikipedia");
+        updateFeedButtonsState("wikipedia");
+        updateDisplayingDate(new Date()); // Reset date to today for new feed
+        fetchPictureOfTheDay(new Date());
+      }
+    });
+  }
+
+  if (wikimediaButton) {
+    wikimediaButton.addEventListener("click", () => {
+      if (feedMode !== "wikimedia") {
+        setFeedMode("wikimedia");
+        updateFeedButtonsState("wikimedia");
+        updateDisplayingDate(new Date()); // Reset date to today for new feed
+        fetchPictureOfTheDay(new Date());
+      }
+    });
+  }
+
   // Function to handle window resize
   function handleResize() {
     // Restart autoscroll if an image is currently displayed
@@ -58,4 +100,7 @@ export function setupEventListeners() {
 
   // Add resize event listener to window
   window.addEventListener("resize", handleResize);
+
+  // Initial update of button states
+  updateFeedButtonsState(feedMode);
 }

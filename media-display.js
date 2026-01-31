@@ -1,7 +1,7 @@
-import { wikipediaApiFetch } from "./api.js";
+import { wikipediaApiFetch, commonsApiFetch, fetchWikimediaPotdFeed } from "./api.js";
 import { potdDateElement, potdTitleElement, sharpImageElement, backgroundVideoElement } from "./dom-elements.js";
 import { updateDisplayingDate, formatDateToYYYYMMDD } from "./date-utils.js";
-import { currentAnimationFrameId, currentPotdData, currentArticleUrl, setCurrentAnimationFrameId, setCurrentPotdData, setCurrentArticleUrl, displayingDateString, userDisplayDateString } from "./state.js";
+import { currentAnimationFrameId, currentPotdData, setCurrentAnimationFrameId, setCurrentPotdData, setCurrentArticleUrl, displayingDateString, userDisplayDateString, feedMode, wikimediaPotdFeed, setWikimediaPotdFeed } from "./state.js";
 
 
 /**
@@ -143,7 +143,7 @@ async function fetchImageData(filename) {
     origin: "*",
     uselang: "en",
   };
-  const dataImageInfo = await wikipediaApiFetch(paramsImageInfo); // Log raw data
+  const dataImageInfo = await commonsApiFetch(paramsImageInfo); // Log raw data
   const pagesImageInfo = dataImageInfo.query.pages;
   const pageKeyImageInfo = Object.keys(pagesImageInfo)[0];
 
@@ -196,7 +196,7 @@ async function fetchImageData(filename) {
     origin: "*",
     uselang: "en",
   };
-  const dataDisplayTitle = await wikipediaApiFetch(paramsDisplayTitle); // Log raw data
+  const dataDisplayTitle = await commonsApiFetch(paramsDisplayTitle); // Log raw data
   const pagesDisplayTitle = dataDisplayTitle.query.pages;
   const pageKeyDisplayTitle = Object.keys(pagesDisplayTitle)[0];
   let displayTitle = filename.replace("File:", "").replace(/\.\w+$/, ""); // Fallback to filename
@@ -221,95 +221,239 @@ async function fetchImageData(filename) {
   };
 }
 
+/**
+ * Parses the Wikimedia Commons Atom feed to extract POTD data.
+ * @param {string} xmlString The XML string of the Atom feed.
+ * @returns {Array} An array of POTD data objects.
+ */
+export async function parseWikimediaAtomFeed(xmlString) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+  const entries = xmlDoc.querySelectorAll("entry");
+  const potdEntries = [];
+
+  for (const entry of entries) {
+    const id = entry.querySelector("id")?.textContent;
+    const dateMatch = id ? id.match(/potd\/(\d{8})/) : null;
+    const dateString = dateMatch ? dateMatch[1] : null; // YYYYMMDD
+
+    // Convert YYYYMMDD to YYYY-MM-DD
+    const formattedDate = dateString ? `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}` : '';
+
+    const title = entry.querySelector("title")?.textContent;
+    const summaryHtml = entry.querySelector("summary")?.textContent;
+
+    if (!summaryHtml) {
+      console.warn("No summary HTML found for entry:", title);
+      continue;
+    }
+
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = summaryHtml;
+
+    // Extract image filename from the srcset of the img tag
+    const imgElement = tempDiv.querySelector("img.mw-file-element");
+    let filename = '';
+    let thumbUrl = '';
+    let description = '';
+    let articleUrl = '';
+
+    if (imgElement) {
+      thumbUrl = imgElement.src;
+      const srcset = imgElement.srcset;
+      // Extract the filename from the first URL in srcset or from src
+      // Example srcset: https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Colors_of_Bishwa_Ijtema.jpg/500px-Colors_of_Bishwa_Ijtema.jpg 1.5x, https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Colors_of_Bishwa_Ijtema.jpg/960px-Colors_of_Bishwa_Ijtema.jpg 2x
+      // Example filename: File:Colors_of_Bishwa_Ijtema.jpg
+      const fileMatch = srcset ? srcset.match(/File:([^ ]+)/) : null; 
+      if (fileMatch && fileMatch[1]) {
+        // The filename is typically the part after /thumb/././ and before the /widthpx- part
+        // This regex is more robust to get the actual filename
+        const filenameFromSrcset = fileMatch[1].match(/([^\/]+\.\w+)$/);
+        if (filenameFromSrcset && filenameFromSrcset[1]) {
+            filename = "File:" + decodeURIComponent(filenameFromSrcset[1]);
+        }
+      } else {
+        // Fallback if srcset is not reliable or not present, try from src
+        const srcMatch = thumbUrl.match(/\/thumb\/\w\/\w{2}\/([^/]+)\//);
+        if (srcMatch && srcMatch[1]) {
+            filename = "File:" + decodeURIComponent(srcMatch[1]);
+        }
+      }
+      
+      // Extract description from the .description.en div
+      const descriptionElement = tempDiv.querySelector("div.description.en");
+      if (descriptionElement) {
+          description = descriptionElement.textContent.trim();
+      }
+
+      // Extract article URL from the first external link (extiw) within the description
+      const articleLink = tempDiv.querySelector("div.description.en a.extiw");
+      if (articleLink && articleLink.href) {
+          articleUrl = articleLink.href;
+      }
+    } else {
+        console.warn("No image element found in summary for entry:", title);
+        continue;
+    }
+    
+    // Lazy loading: Do not fetch fullImageData here. Store filename and thumbUrl.
+    potdEntries.push({
+      date: formattedDate,
+      title: description || title, // Prefer description as title
+      descriptionHtml: description,
+      url: thumbUrl, // Initially use thumbnail URL
+      pageUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(filename)}`,
+      articleUrl: articleUrl,
+      filename: filename, // Store filename for lazy loading
+      width: 0, // Placeholder
+      height: 0, // Placeholder
+      is_video: false, // Placeholder
+      rawEntry: entry, // Keep raw entry for debugging if needed
+    });
+  }
+  return potdEntries;
+}
+
 // Modified to accept a date parameter and use fetchImageData
 export async function fetchPictureOfTheDay(date) {
   updateDisplayingDate(date); // Update the global date tracker and UI
 
   console.log(`Fetching picture of the day for ${displayingDateString}...`);
-  const title = `Template:POTD_protected/${displayingDateString}`;
-  const params = {
-    action: "query",
-    format: "json",
-    formatversion: "2",
-    prop: "images",
-    titles: title,
-    origin: "*",
-    uselang: "en",
-  };
+  let potdData;
 
-  try {
-    const data = await wikipediaApiFetch(params);
-    const pages = data.query.pages;
-    const pageKey = Object.keys(pages)[0];
+  if (feedMode === "wikipedia") {
+    const title = `Template:POTD_protected/${displayingDateString}`;
+    const params = {
+      action: "query",
+      format: "json",
+      formatversion: "2",
+      prop: "images",
+      titles: title,
+      origin: "*",
+      uselang: "en",
+    };
 
-    if (
-      pageKey !== "-1" &&
-      pages[pageKey].images &&
-      pages[pageKey].images.length > 0
-    ) {
-      const filename = pages[pageKey].images[0].title;
-      const image_page_url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-      const imageData = await fetchImageData(filename); // Call the new function
+    try {
+      const data = await wikipediaApiFetch(params);
+      const pages = data.query.pages;
+      const pageKey = Object.keys(pages)[0];
 
-      if (imageData && imageData.url) {
-        // Fetch featured article link
-        const articleTitleParams = {
-          action: "query",
-          format: "json",
-          prop: "revisions",
-          rvprop: "content",
-          titles: title, // This is the template title e.g. Template:POTD_protected/YYYY-MM-DD
-          rvslots: "main",
-          origin: "*",
-          uselang: "en",
-        };
-        const articleData = await wikipediaApiFetch(articleTitleParams);
-        const articlePages = articleData.query.pages;
-        const articlePageKey = Object.keys(articlePages)[0];
-        let featuredArticleUrl = "";
+      if (
+        pageKey !== "-1" &&
+        pages[pageKey].images &&
+        pages[pageKey].images.length > 0
+      ) {
+        const filename = pages[pageKey].images[0].title;
+        const image_page_url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+        const imageData = await fetchImageData(filename); // Call the new function
 
-        if (
-          articlePageKey !== "-1" &&
-          articlePages[articlePageKey].revisions &&
-          articlePages[articlePageKey].revisions.length > 0
-        ) {
-          const wikitext =
-            articlePages[articlePageKey].revisions[0].slots.main["*"];
-          // Use regex to find the first main article link, typically [[Article Name]]
-          const match = wikitext.match(/\[\[([^:\]]+?)\]\]/); // Find [[Article Name]] but not [[File:...]] or [[Category:...]]
-          if (match && match[1]) {
-            featuredArticleUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(match[1].trim())}`;
+        if (imageData && imageData.url) {
+          // Fetch featured article link
+          const articleTitleParams = {
+            action: "query",
+            format: "json",
+            prop: "revisions",
+            rvprop: "content",
+            titles: title, // This is the template title e.g. Template:POTD_protected/YYYY-MM-DD
+            rvslots: "main",
+            origin: "*",
+            uselang: "en",
+          };
+          const articleData = await wikipediaApiFetch(articleTitleParams);
+          const articlePages = articleData.query.pages;
+          const articlePageKey = Object.keys(articlePages)[0];
+          let featuredArticleUrl = "";
+
+          if (
+            articlePageKey !== "-1" &&
+            articlePages[articlePageKey].revisions &&
+            articlePages[articlePageKey].revisions.length > 0
+          ) {
+            const wikitext =
+              articlePages[articlePageKey].revisions[0].slots.main["*"];
+            // Use regex to find the first main article link, typically [[Article Name]]
+            const match = wikitext.match(/\[\[([^:\]]+?)\]\]/); // Find [[Article Name]] but not [[File:...]] or [[Category:...]]
+            if (match && match[1]) {
+              featuredArticleUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(match[1].trim())}`;
+            }
           }
+
+          potdData = {
+            title: imageData.descriptionHtml || imageData.displayTitle, // Use descriptionHtml as title, fallback to displayTitle
+            url: imageData.url,
+            descriptionHtml: imageData.descriptionHtml, // Pass the simplified description
+            pageUrl: image_page_url,
+            articleUrl: featuredArticleUrl, // Add the featured article URL
+            date: displayingDateString, // Add date to potdData for caching and consistent display          width: imageData.width,
+            height: imageData.height,
+            is_video: imageData.is_video, // IMPORTANT: Include the is_video flag
+          };
+        } else {
+          console.error("Could not fetch image data for:", filename);
         }
-
-        const potdData = {
-          title: imageData.descriptionHtml || imageData.displayTitle, // Use descriptionHtml as title, fallback to displayTitle
-          url: imageData.url,
-          descriptionHtml: imageData.descriptionHtml, // Pass the simplified description
-          pageUrl: image_page_url,
-          articleUrl: featuredArticleUrl, // Add the featured article URL
-          date: displayingDateString, // Add date to potdData for caching and consistent display          width: imageData.width,
-          height: imageData.height,
-          is_video: imageData.is_video, // IMPORTANT: Include the is_video flag
-        };
-
-        displayPicture(potdData);
       } else {
-        console.error("Could not fetch image data for:", filename);
+        console.error("Could not find POTD images for today using title:", title);
+        displayError(
+          "No Picture Found",
+          `No Picture of the Day found for ${displayingDateString}.`,
+        );
       }
-    } else {
-      console.error("Could not find POTD images for today using title:", title);
+    } catch (error) {
+      console.error("Error fetching Picture of the Day:", error);
       displayError(
-        "No Picture Found",
-        `No Picture of the Day found for ${displayingDateString}.`,
+        "Error Loading Picture",
+        `An error occurred while loading the Picture of the Day for ${displayingDateString}.`,
       );
     }
-  } catch (error) {
-    console.error("Error fetching Picture of the Day:", error);
-    displayError(
-      "Error Loading Picture",
-      `An error occurred while loading the Picture of the Day for ${displayingDateString}.`,
-    );
+  } else if (feedMode === "wikimedia") {
+    // Logic for Wikimedia feed
+    if (wikimediaPotdFeed.length === 0) {
+      // This should ideally be pre-loaded in main.js, but as a fallback
+      console.warn("Wikimedia POTD feed not loaded. Attempting to load now.");
+      const feedUrl = "https://commons.wikimedia.org/w/api.php?action=featuredfeed&feed=potd&feedformat=atom&language=en";
+      try {
+        const xmlString = await fetchWikimediaPotdFeed(feedUrl);
+        const parsedFeed = await parseWikimediaAtomFeed(xmlString);
+        setWikimediaPotdFeed(parsedFeed);
+      } catch (error) {
+        console.error("Error loading Wikimedia POTD feed:", error);
+        displayError("Error Loading Feed", "Could not load Wikimedia Picture of the Day feed.");
+        return;
+      }
+    }
+
+    // Find the entry for the displayingDate
+    const targetDate = formatDateToYYYYMMDD(date);
+    let entry = wikimediaPotdFeed.find(item => item.date === targetDate);
+
+    if (entry) {
+      // If full image data hasn't been fetched yet, fetch it now
+      // Check for a characteristic property of fullImageData, e.g., 'width' or 'height'
+      if ((!entry.width || !entry.height) && entry.filename) { // Only fetch if dimensions are 0 and filename exists
+        console.log(`Lazily fetching full image data for Wikimedia POTD: ${entry.filename}`);
+        const fullImageData = await fetchImageData(entry.filename);
+        if (fullImageData) {
+          entry = { ...entry, ...fullImageData }; // Merge full image data into the entry
+          // Update the entry in the wikimediaPotdFeed array as well
+          const index = wikimediaPotdFeed.findIndex(item => item.date === targetDate);
+          if (index !== -1) {
+            wikimediaPotdFeed[index] = entry; // Update the stored entry with full data
+          }
+        } else {
+          console.error("Failed to lazily fetch full image data for:", entry.filename);
+          // Fallback to thumbnail or display error
+          entry.url = entry.thumbUrl || ""; // Ensure there's a URL, even if thumbnail
+        }
+      }
+      potdData = entry;
+    } else {
+      console.error("Could not find Wikimedia POTD for date:", targetDate);
+      displayError("No Picture Found", `No Wikimedia Picture of the Day found for ${targetDate}.`);
+    }
+  }
+
+  if (potdData) {
+    displayPicture(potdData);
   }
 }
 

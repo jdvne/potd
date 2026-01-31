@@ -4,6 +4,8 @@ export let userDisplayDateString = "";
 export let currentArticleUrl = "";
 export let currentAnimationFrameId = null;
 export let currentPotdData = null;
+export let feedMode = "wikipedia"; // Default feed mode
+export let wikimediaPotdFeed = []; // To store parsed Wikimedia POTD entries
 
 export function setDisplayingDate(date) {
   displayingDate = date;
@@ -27,4 +29,12 @@ export function setCurrentAnimationFrameId(id) {
 
 export function setCurrentPotdData(data) {
   currentPotdData = data;
+}
+
+export function setFeedMode(mode) {
+  feedMode = mode;
+}
+
+export function setWikimediaPotdFeed(feed) {
+  wikimediaPotdFeed = feed;
 }

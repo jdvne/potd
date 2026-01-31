@@ -20,3 +20,11 @@ export async function commonsApiFetch(params) {
   }
   return response.json();
 }
+
+export async function fetchWikimediaPotdFeed(feedUrl) {
+  const response = await fetch(feedUrl);
+  if (!response.ok) {
+    throw new Error(`Wikimedia Commons Atom feed request failed: ${response.statusText}`);
+  }
+  return response.text();
+}
