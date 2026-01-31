@@ -1,44 +1,18 @@
-const ENDPOINT = "https://en.wikipedia.org/w/api.php";
-const COMMONS_ENDPOINT = "https://commons.wikimedia.org/w/api.php"; // New endpoint for Wikimedia Commons
+import { wikipediaApiFetch } from "./api.js";
+import { potdDateElement, potdTitleElement, sharpImageElement, backgroundVideoElement } from "./dom-elements.js";
+import { updateDisplayingDate, formatDateToYYYYMMDD } from "./date-utils.js";
+import { currentAnimationFrameId, currentPotdData, currentArticleUrl, setCurrentAnimationFrameId, setCurrentPotdData, setCurrentArticleUrl, displayingDateString, userDisplayDateString } from "./state.js";
 
-// Cache DOM elements
-const potdDateElement = document.getElementById("potd-date");
-const arrowLeftElement = document.getElementById("arrow-left");
-const arrowRightElement = document.getElementById("arrow-right");
-const potdTitleElement = document.getElementById("potd-title");
-const potdContainerElement = document.querySelector(".container"); // Assuming .container is the wrapping div
-const sharpImageElement = document.getElementById("sharp-image");
-const backgroundVideoElement = document.getElementById("background-video");
-
-async function wikipediaApiFetch(params) {
-  const url = `${ENDPOINT}?${new URLSearchParams(params).toString()}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Wikipedia API request failed: ${response.statusText}`);
-  }
-  return response.json();
-}
-
-async function commonsApiFetch(params) {
-  const url = `${COMMONS_ENDPOINT}?${new URLSearchParams(params).toString()}`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(
-      `Wikimedia Commons API request failed: ${response.statusText}`,
-    );
-  }
-  return response.json();
-}
 
 /**
  * Starts an autoscroll animation for the background image.
  * @param {string} imageUrl The URL of the image to autoscroll.
  * @param {HTMLElement} element The HTML element whose background to autoscroll (e.g., sharpImageElement).
  */
-function startBackgroundAutoscroll(imageUrl, element) {
+export function startBackgroundAutoscroll(imageUrl, element) {
   if (currentAnimationFrameId) {
     cancelAnimationFrame(currentAnimationFrameId);
-    currentAnimationFrameId = null;
+    setCurrentAnimationFrameId(null);
   }
 
   element.style.display = "block";
@@ -113,7 +87,7 @@ function startBackgroundAutoscroll(imageUrl, element) {
       if (delayStartTime !== null) {
         if (timestamp - delayStartTime < delayDuration) {
           // Still in delay, request next frame without updating scroll
-          currentAnimationFrameId = requestAnimationFrame(animateAutoscroll);
+          setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
           return;
         } else {
           // Delay finished, clear delayStartTime
@@ -145,10 +119,10 @@ function startBackgroundAutoscroll(imageUrl, element) {
         element.style.backgroundPositionY = `-${currentScroll}px`;
       }
 
-      currentAnimationFrameId = requestAnimationFrame(animateAutoscroll);
+      setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
     }
 
-    currentAnimationFrameId = requestAnimationFrame(animateAutoscroll);
+    setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
   };
 
   img.onerror = () => {
@@ -157,115 +131,6 @@ function startBackgroundAutoscroll(imageUrl, element) {
     element.style.display = "none";
   };
 }
-
-/**
- * Gets today's date normalized to midnight (00:00:00).
- * @returns {Date} Today's date at midnight.
- */
-function getTodayAtMidnight() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Set to midnight
-  return today;
-}
-
-let displayingDate = new Date(); // This will be our mutable date object
-let displayingDateString = ""; // YYYY-MM-DD string for API and cache keys
-let userDisplayDateString = ""; // Human-readable date string for display
-let currentArticleUrl = ""; // Stores the URL of the currently displayed featured article
-let currentAnimationFrameId = null; // Global variable to store animation frame ID
-let currentPotdData = null; // Global variable to store the currently displayed POTD data
-
-/**
- * Formats a Date object to a YYYY-MM-DD string.
- * @param {Date} date The date to format.
- * @returns {string} The date in YYYY-MM-DD format.
- */
-function formatDateToYYYYMMDD(date) {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Returns the appropriate ordinal suffix for a day number (e.g., "st", "nd", "rd", "th").
- * @param {number} day The day of the month.
- * @returns {string} The ordinal suffix.
- */
-function getOrdinalSuffix(day) {
-  if (day > 3 && day < 21) return "th"; // Deals with 11th, 12th, 13th
-  switch (day % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-}
-
-/**
- * Updates the global displayingDate and its string representations, then updates the UI.
- * @param {Date} date The new date to display.
- */
-function updateDisplayingDate(date) {
-  displayingDate = date;
-  displayingDateString = formatDateToYYYYMMDD(date);
-
-  const day = date.getDate();
-  const suffix = getOrdinalSuffix(day);
-  const month = date.toLocaleDateString("en-US", { month: "long" });
-  const year = date.getFullYear();
-
-  userDisplayDateString = `${month} ${day}${suffix}, ${year}`;
-  if (potdDateElement) {
-    potdDateElement.textContent = userDisplayDateString; // Display the pretty printed date
-  }
-  updateRightArrowState(); // Update arrow state after date changes
-}
-
-/**
- * Updates the disabled state of the right arrow based on whether displayingDate is today or in the future.
- */
-function updateRightArrowState() {
-  const todayAtMidnight = getTodayAtMidnight();
-  const displayingDateAtMidnight = new Date(displayingDate);
-  displayingDateAtMidnight.setHours(0, 0, 0, 0);
-
-  if (displayingDateAtMidnight >= todayAtMidnight) {
-    arrowRightElement.classList.add("disabled-arrow");
-  } else {
-    arrowRightElement.classList.remove("disabled-arrow");
-  }
-}
-
-/**
- * Navigates the displayed date by a given direction (+1 for forward, -1 for backward).
- * @param {number} direction The direction to navigate (-1 for backward, 1 for forward).
- */
-function navigateDate(direction) {
-  const newDate = new Date(displayingDate);
-  newDate.setDate(newDate.getDate() + direction);
-  newDate.setHours(0, 0, 0, 0); // Normalize newDate to midnight
-
-  if (direction === 1) {
-    // Only check for future dates when navigating right
-    const todayAtMidnight = getTodayAtMidnight();
-    if (newDate > todayAtMidnight) {
-      return; // Do not go beyond today's date
-    }
-  }
-  fetchPictureOfTheDay(newDate);
-}
-
-// Initialize with today's date and display it
-updateDisplayingDate(new Date());
-// Removed redundant updateRightArrowState() call here as it's called in updateDisplayingDate
-
-// Directly fetch the picture of the day without caching checks at startup
-fetchPictureOfTheDay(displayingDate);
 
 // Renamed from fetchImageSrc and modified to fetch more info
 async function fetchImageData(filename) {
@@ -357,7 +222,7 @@ async function fetchImageData(filename) {
 }
 
 // Modified to accept a date parameter and use fetchImageData
-async function fetchPictureOfTheDay(date) {
+export async function fetchPictureOfTheDay(date) {
   updateDisplayingDate(date); // Update the global date tracker and UI
 
   console.log(`Fetching picture of the day for ${displayingDateString}...`);
@@ -448,7 +313,7 @@ async function fetchPictureOfTheDay(date) {
   }
 }
 
-function displayError(title, message) {
+export function displayError(title, message) {
   document.body.style.setProperty("--image-url", "none"); // Clear background image
   potdTitleElement.textContent = title;
   if (potdDateElement) {
@@ -460,11 +325,11 @@ function displayError(title, message) {
  * Displays the Picture of the Day data on the page.
  * @param {object} potdData The data for the Picture of the Day.
  */
-function displayPicture(potdData) {
-  currentPotdData = potdData; // Store the current POTD data globally
+export function displayPicture(potdData) {
+  setCurrentPotdData(potdData); // Store the current POTD data globally
   // Store new title and article URL immediately
   potdTitleElement.innerHTML = potdData.title;
-  currentArticleUrl = potdData.articleUrl;
+  setCurrentArticleUrl(potdData.articleUrl);
 
   // Set the text content of the date element
   if (potdDateElement) {
@@ -507,7 +372,7 @@ function displayPicture(potdData) {
       if (currentAnimationFrameId) {
         // Stop any ongoing image autoscroll
         cancelAnimationFrame(currentAnimationFrameId);
-        currentAnimationFrameId = null;
+        setCurrentAnimationFrameId(null);
       }
     };
 
@@ -558,58 +423,3 @@ function displayPicture(potdData) {
     };
   }
 }
-
-// Add keyboard event listener for arrow keys
-document.addEventListener("keydown", function (event) {
-  // Only navigate if the key event isn't from an input field
-  if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
-    return;
-  }
-
-  if (event.key === "ArrowLeft") {
-    navigateDate(-1);
-  } else if (event.key === "ArrowRight") {
-    navigateDate(1);
-  }
-});
-
-arrowLeftElement.addEventListener("click", function () {
-  navigateDate(-1);
-});
-
-arrowRightElement.addEventListener("click", function () {
-  navigateDate(1);
-});
-
-// Add click listener for potd-title to navigate to the featured article
-potdTitleElement.addEventListener("click", function () {
-  if (currentArticleUrl) {
-    window.location.href = currentArticleUrl; // Navigate in current tab
-  }
-});
-
-// Add hover listeners for potd-title to expand/shrink description
-if (potdContainerElement) {
-  potdContainerElement.addEventListener("mouseover", function () {
-    potdTitleElement.classList.add("expanded");
-  });
-
-  potdContainerElement.addEventListener("mouseout", function () {
-    potdTitleElement.classList.remove("expanded");
-  });
-}
-
-// Function to handle window resize
-function handleResize() {
-  // Restart autoscroll if an image is currently displayed
-  if (
-    sharpImageElement.style.display === "block" &&
-    currentPotdData &&
-    currentPotdData.url
-  ) {
-    startBackgroundAutoscroll(currentPotdData.url, sharpImageElement);
-  }
-}
-
-// Add resize event listener to window
-window.addEventListener("resize", handleResize);

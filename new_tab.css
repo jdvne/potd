@@ -89,10 +89,17 @@ body {
   /* No padding-bottom here, container margin will handle spacing */
 }
 
-#date-navigation-container {
+#bottom-controls-container {
   position: fixed;
   bottom: 20px;
   left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 3;
+}
+
+#date-navigation-container {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -104,9 +111,41 @@ body {
   border-radius: 12px; /* Consistent border radius */
   color: var(--text-color);
   font-size: 16px;
-  z-index: 3;
   transition: all 0.2s ease-in-out; /* Smooth transition for hover */
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow for contrast */
+}
+
+#feed-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 5px;
+  border-radius: 12px;
+}
+
+.feed-button {
+  background-color: transparent;
+  border: none;
+  color: var(--text-color);
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.feed-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.feed-button.active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 #date-navigation-container .arrow {

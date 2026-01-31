@@ -18,11 +18,23 @@
       </div>
     </div>
   
+    <div id="bottom-controls-container">
     <div id="date-navigation-container">
       <span id="arrow-left" class="arrow">&lt;</span>
       <span id="potd-date"></span>
       <span id="arrow-right" class="arrow">&gt;</span>
     </div>
-    <script src="new_tab.js"></script>
+    <div id="feed-selector-container">
+      <button id="wikipedia-button" class="feed-button active">Wikipedia</button>
+      <button id="wikimedia-button" class="feed-button">Wikimedia</button>
+    </div>
+  </div>
+    <script type="module" src="api.js"></script>
+    <script type="module" src="dom-elements.js"></script>
+    <script type="module" src="state.js"></script>
+    <script type="module" src="date-utils.js"></script>
+    <script type="module" src="media-display.js"></script>
+    <script type="module" src="event-handlers.js"></script>
+    <script type="module" src="main.js"></script>
   </body>
   </html>

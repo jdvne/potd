@@ -1,17 +1,17 @@
 # New Tab Customizer Extension
 
-This is a simple browser extension designed to replace your browser's default new tab page with a custom one.
+This is a simple browser extension designed to replace your browser's default new tab page with a custom one, displaying the "Picture of the Day" from Wikipedia or Wikimedia Commons.
 
 ## Features
 
-This extension transforms your browser's new tab page into a dynamic display of the "Wikipedia Picture of the Day" (POTD), offering the following features:
+This extension transforms your browser's new tab page into a dynamic display of the daily Picture of the Day (POTD), offering an engaging visual experience with navigation and information about the displayed media.
 
--   **Dynamic New Tab Content:** Replaces the default new tab page with a beautiful, full-screen display of the daily Wikipedia Picture of the Day, which can be either an image or a video.
--   **Historical Navigation:** Easily browse through past Pictures of the Day using intuitive navigation arrows or your keyboard's left/right arrow keys.
--   **Interactive Information Display:** A "liquid glass" overlay elegantly presents the title and description of the current POTD.
--   **Wikipedia Integration:** Click on the POTD title to directly open the related Wikipedia article in your current tab, providing more context and information.
--   **Expandable Descriptions:** Hover over the POTD title to reveal its full description, even if it's initially truncated.
--   **Immersive Backgrounds:** Images that are larger than the viewport automatically pan slowly, creating an immersive and dynamic visual experience.
+*   **Dynamic New Tab Content:** Replaces the default new tab page with a beautiful, full-screen display of the daily Wikipedia Picture of the Day, which can be either an image or a video.
+*   **Historical Navigation:** Easily browse through past Pictures of the Day using intuitive navigation arrows or your keyboard's left/right arrow keys.
+*   **Interactive Information Display:** A "liquid glass" overlay elegantly presents the title and description of the current POTD.
+*   **Wikipedia Integration:** Click on the POTD title to directly open the related Wikipedia article in your current tab, providing more context and information.
+*   **Expandable Descriptions:** Hover over the POTD title to reveal its full description, even if it's initially truncated.
+*   **Immersive Backgrounds:** Images that are larger than the viewport automatically pan slowly, creating an immersive and dynamic visual experience.
 
 ## Setup Instructions
 
@@ -37,4 +37,4 @@ To use or develop this extension, you'll need to load it as an unpacked extensio
     -   The extension should now appear in your list of installed extensions.
     -   Open a new tab in your browser. You should see your custom new tab page instead of the default one.
 
-To make changes to the extension, simply edit the `new_tab.html`, `new_tab.css`, or `new_tab.js` files. After making changes, go back to the extensions management page and click the "Reload" icon (usually a circular arrow) for this extension to see your updates.
+For more technical details on the project structure, modularization, and development specifics, please refer to [GEMINI.md](GEMINI.md).
