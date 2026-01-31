@@ -265,16 +265,26 @@ body {
   height: 100%;
   width: 50%;
   background-color: rgba(255, 255, 255, 0.2); /* Highlight color */
-  border-radius: 12px; /* Match container border-radius */
-  transition: left 0.3s ease-in-out; /* Smooth transition for movement */
+  /* border-radius will be applied dynamically by active classes */
+  transition: left 0.3s ease-in-out, mask-image 0.3s ease-in-out, border-radius 0.3s ease-in-out; /* Add border-radius to transition */
   z-index: 0; /* Place behind buttons, inside container */
+  /* Initial mask to avoid sharp edges on both sides by default (or when no specific active state is applied) */
+  mask-image: linear-gradient(to right, transparent 10%, black 25%, black 75%, transparent 90%);
+  -webkit-mask-image: linear-gradient(to right, transparent 10%, black 25%, black 75%, transparent 90%);
 }
 
 #feed-selector-container.wikipedia-active::before {
   left: 0;
+  border-radius: 12px 0 0 12px; /* Rounded on left, sharp on right */
+  /* Fade out on the right side - increased fade area */
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
 
 #feed-selector-container.wikimedia-active::before {
   left: 50%; /* Moves to the right half */
+  border-radius: 0 12px 12px 0; /* Sharp on left, rounded on right */
+  /* Fade out on the left side - increased fade area */
+  mask-image: linear-gradient(to left, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, black 85%, transparent 100%);
 }
-
