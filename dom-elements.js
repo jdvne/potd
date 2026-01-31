@@ -8,3 +8,4 @@ export const sharpImageElement = document.getElementById("sharp-image");
 export const backgroundVideoElement = document.getElementById("background-video");
 export const wikipediaButton = document.getElementById("wikipedia-button");
 export const wikimediaButton = document.getElementById("wikimedia-button");
+export const feedSelectorContainer = document.getElementById("feed-selector-container");

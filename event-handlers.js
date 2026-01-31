@@ -1,24 +1,34 @@
-import { arrowLeftElement, arrowRightElement, potdTitleElement, potdContainerElement, sharpImageElement } from "./dom-elements.js";
+import { arrowLeftElement, arrowRightElement, potdTitleElement, potdContainerElement, sharpImageElement, wikipediaButton, wikimediaButton, feedSelectorContainer } from "./dom-elements.js";
 import { navigateDate, updateDisplayingDate } from "./date-utils.js";
 import { currentArticleUrl, currentPotdData, displayingDate, feedMode, setFeedMode } from "./state.js";
 import { startBackgroundAutoscroll, fetchPictureOfTheDay } from "./media-display.js";
-import { wikipediaButton, wikimediaButton } from "./dom-elements.js";
 
 
 function updateFeedButtonsState(activeMode) {
+  if (feedSelectorContainer) { // Ensure the container exists
+    if (activeMode === "wikipedia") {
+      feedSelectorContainer.classList.add("wikipedia-active");
+      feedSelectorContainer.classList.remove("wikimedia-active");
+    } else if (activeMode === "wikimedia") {
+      feedSelectorContainer.classList.add("wikimedia-active");
+      feedSelectorContainer.classList.remove("wikipedia-active");
+    }
+  }
+
+  // Also update the individual button classes for any other styling that might depend on it (e.g., text color changes)
   if (wikipediaButton) {
     if (activeMode === "wikipedia") {
       wikipediaButton.classList.add("active");
-    } else {
-      wikipediaButton.classList.remove("active");
     }
+  } else {
+    wikipediaButton.classList.remove("active");
   }
   if (wikimediaButton) {
     if (activeMode === "wikimedia") {
       wikimediaButton.classList.add("active");
-    } else {
-      wikimediaButton.classList.remove("active");
     }
+  } else {
+    wikimediaButton.classList.remove("active");
   }
 }
 

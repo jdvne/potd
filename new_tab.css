@@ -119,12 +119,16 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Removed background, backdrop-filter, box-shadow - these will go on ::before */
+  border: var(--glass-border); /* Keep border */
+  border-radius: 12px;
+  position: relative; /* Needed for absolute positioning of highlight */
+  overflow: hidden; /* Ensures sliding highlight stays within bounds */
+  /* Re-add the glass effect for the overall container appearance */
   background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
   backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%);
-  border: var(--glass-border);
   box-shadow: var(--glass-shadow);
-  padding: 5px;
-  border-radius: 12px;
+  padding: 0; /* No padding on container itself, padding will be on buttons */
 }
 
 .feed-button {
@@ -133,19 +137,25 @@ body {
   color: var(--text-color);
   font-family: "Lora", serif;
   font-style: italic;
-  font-size: 14px;
-  padding: 5px 10px;
-  border-radius: 8px;
+  font-size: 16px; /* Matched font size to #date-navigation-container */
+  padding: 10px 15px; /* Add padding to buttons themselves */
+  border-radius: 8px; /* Keep button specific border-radius */
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out; /* Transition text color */
+  flex: 1; /* Make each button take equal width */
+  text-align: center; /* Center the text inside the button */
+  position: relative; /* Needed for z-index */
+  z-index: 1; /* Place above pseudo-element */
 }
 
 .feed-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  /* Background handled by pseudo-element, only visual changes for hover */
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .feed-button.active {
-  background-color: rgba(255, 255, 255, 0.2);
+  /* Background handled by pseudo-element */
+  /* No direct background-color on active button */
 }
 
 #date-navigation-container .arrow {
@@ -246,3 +256,25 @@ body {
 #settings input[type="checkbox"] {
   margin-right: 5px;
 }
+/* Sliding highlight for feed-selector-container */
+#feed-selector-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background-color: rgba(255, 255, 255, 0.2); /* Highlight color */
+  border-radius: 12px; /* Match container border-radius */
+  transition: left 0.3s ease-in-out; /* Smooth transition for movement */
+  z-index: 0; /* Place behind buttons, inside container */
+}
+
+#feed-selector-container.wikipedia-active::before {
+  left: 0;
+}
+
+#feed-selector-container.wikimedia-active::before {
+  left: 50%; /* Moves to the right half */
+}
+
