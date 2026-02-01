@@ -75,25 +75,13 @@ body {
   display: none; /* Hidden by default, shown by JS when it's a video */
 }
 
-.content-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end; /* Push content to the bottom right */
-  justify-content: flex-end; /* Push content to the bottom right */
-  z-index: 2; /* Ensure it's on top of both image layers */
-  /* No padding-bottom here, container margin will handle spacing */
-}
-
 #bottom-controls-container {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  display: flex;
+  right: 20px; /* Make it span the entire bottom width */
+  display: grid;
+  grid-template-columns: max-content max-content 1fr minmax(max-content, 50%); /* Date, Mode, Gap, Title (max 50%) */
   align-items: center;
   gap: 20px;
   z-index: 3;
@@ -176,17 +164,18 @@ body {
   pointer-events: none; /* Ensure no click events */
 }
 
-.container {
-  text-align: right; /* Align text to the right within the container */
+#potd-title-wrapper {
+  grid-column: 4; /* Explicitly place in the fourth column */
+  text-align: right;
+  /* margin-left: auto; removed as 1fr gap handles spacing */
   padding: 10px 15px;
   background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%); /* Enhanced liquid glass effect */
-  border-radius: 12px; /* Consistent border radius */
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%);
+  border-radius: 12px;
   border: var(--glass-border);
   box-shadow: var(--glass-shadow);
-  max-width: calc(50vw - 20px);
-  margin: 20px;
-  transition: all 0.2s ease-in-out; /* Smooth transition for hover */
+  max-width: calc(50vw - 20px); /* Limit width as per previous container */
+  transition: all 0.2s ease-in-out;
 }
 
 #potd-title {
@@ -291,4 +280,31 @@ body {
   /* Fade out on the left side - increased fade area */
   mask-image: linear-gradient(to left, black 70%, transparent 100%);
   -webkit-mask-image: linear-gradient(to left, black 70%, transparent 100%);
+}
+
+@media (max-width: 768px) {
+  #bottom-controls-container {
+    grid-template-columns: 1fr; /* Stack items vertically */
+    grid-template-areas:
+      "title"
+      "date"
+      "mode";
+  }
+
+  #potd-title-wrapper {
+    grid-area: title;
+    text-align: center; /* Center align title on small screens */
+    margin: 0 auto; /* Center the wrapper itself */
+    max-width: 100%; /* Allow title to take full width */
+  }
+
+  #date-navigation-container {
+    grid-area: date;
+    margin: 0 auto; /* Center the date navigation */
+  }
+
+  #feed-selector-container {
+    grid-area: mode;
+    margin: 0 auto; /* Center the feed selector */
+  }
 }
