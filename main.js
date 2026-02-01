@@ -21,7 +21,7 @@ async function initializeApp() {
     // Continue app initialization even if feed fails to load
   }
 
-  // Directly fetch the picture of the day based on the initial feedMode
+  // Fetch and display the picture of the day for the current date, eagerly fetching for both modes.
   fetchPictureOfTheDay(displayingDate);
 
   // Setup all event listeners
