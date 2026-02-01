@@ -271,20 +271,24 @@ body {
   /* Initial mask to avoid sharp edges on both sides by default (or when no specific active state is applied) */
   mask-image: linear-gradient(to right, transparent 10%, black 25%, black 75%, transparent 90%);
   -webkit-mask-image: linear-gradient(to right, transparent 10%, black 25%, black 75%, transparent 90%);
+#wikipedia-button:focus,
+#wikimedia-button:focus {
+  outline: none;
+}
 }
 
 #feed-selector-container.wikipedia-active::before {
   left: 0;
   border-radius: 12px 0 0 12px; /* Rounded on left, sharp on right */
   /* Fade out on the right side - increased fade area */
-  mask-image: linear-gradient(to right, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
 }
 
 #feed-selector-container.wikimedia-active::before {
   left: 50%; /* Moves to the right half */
   border-radius: 0 12px 12px 0; /* Sharp on left, rounded on right */
   /* Fade out on the left side - increased fade area */
-  mask-image: linear-gradient(to left, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to left, black 85%, transparent 100%);
+  mask-image: linear-gradient(to left, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, black 70%, transparent 100%);
 }
