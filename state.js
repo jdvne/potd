@@ -4,7 +4,8 @@ export let userDisplayDateString = "";
 export let currentArticleUrl = "";
 export let currentAnimationFrameId = null;
 export let currentPotdData = null;
-export let feedMode = "wikipedia"; // Default feed mode
+const storedFeedMode = localStorage.getItem("feedMode");
+export let feedMode = storedFeedMode ? storedFeedMode : "wikipedia";
 
 // Cache for POTD data, keyed by date string (YYYY-MM-DD)
 export const wikipediaPotdCache = {};
@@ -51,6 +52,7 @@ export function setCurrentPotdData(data) {
 
 export function setFeedMode(mode) {
   feedMode = mode;
+  localStorage.setItem("feedMode", mode);
 }
 
 export function setWikimediaPotdFeed(feed) {
