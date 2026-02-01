@@ -79,8 +79,8 @@ export function setupEventListeners() {
       if (feedMode !== "wikipedia") {
         setFeedMode("wikipedia");
         updateFeedButtonsState("wikipedia");
-        updateDisplayingDate(new Date()); // Reset date to today for new feed
-        fetchPictureOfTheDay(new Date());
+        updateDisplayingDate(displayingDate); // Maintain current date
+        fetchPictureOfTheDay(displayingDate);
       }
     });
   }
@@ -90,8 +90,8 @@ export function setupEventListeners() {
       if (feedMode !== "wikimedia") {
         setFeedMode("wikimedia");
         updateFeedButtonsState("wikimedia");
-        updateDisplayingDate(new Date()); // Reset date to today for new feed
-        fetchPictureOfTheDay(new Date());
+        updateDisplayingDate(displayingDate); // Maintain current date
+        fetchPictureOfTheDay(displayingDate);
       }
     });
   }
