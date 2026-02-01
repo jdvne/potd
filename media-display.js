@@ -9,127 +9,118 @@ import { currentAnimationFrameId, currentPotdData, setCurrentAnimationFrameId, s
  * @param {string} imageUrl The URL of the image to autoscroll.
  * @param {HTMLElement} element The HTML element whose background to autoscroll (e.g., sharpImageElement).
  */
-export function startBackgroundAutoscroll(imageUrl, element) {
+export function startBackgroundAutoscroll(loadedImageElement, element) {
   if (currentAnimationFrameId) {
     cancelAnimationFrame(currentAnimationFrameId);
     setCurrentAnimationFrameId(null);
   }
 
   element.style.display = "block";
-  element.style.backgroundImage = `url('${imageUrl}')`;
+  element.style.backgroundImage = `url('${loadedImageElement.src}')`;
   element.style.backgroundRepeat = "no-repeat";
 
-  const img = new Image();
-  img.src = imageUrl;
+  // Use the passed loadedImageElement directly
+  const img = loadedImageElement;
 
-  img.onload = () => {
-    const containerWidth = element.offsetWidth;
-    const containerHeight = element.offsetHeight;
-    const imageAspectRatio = img.naturalWidth / img.naturalHeight;
-    const containerAspectRatio = containerWidth / containerHeight;
+  // The image is already loaded, so we can proceed directly
+  const containerWidth = element.offsetWidth;
+  const containerHeight = element.offsetHeight;
+  const imageAspectRatio = img.naturalWidth / img.naturalHeight;
+  const containerAspectRatio = containerWidth / containerHeight;
 
-    let imageRenderedWidth, imageRenderedHeight;
-    let scrollableDimension = 0;
-    let isHorizontalScroll = false;
+  let imageRenderedWidth, imageRenderedHeight;
+  let scrollableDimension = 0;
+  let isHorizontalScroll = false;
 
-    // Determine if we need horizontal or vertical scroll, or just centering
-    if (imageAspectRatio > containerAspectRatio) {
-      // Image is relatively wider than the container -> prioritize horizontal scroll
-      element.style.backgroundSize = `auto ${containerHeight}px`; // Fit height
-      imageRenderedWidth =
-        (img.naturalWidth / img.naturalHeight) * containerHeight;
-      imageRenderedHeight = containerHeight;
-      scrollableDimension = imageRenderedWidth - containerWidth;
-      isHorizontalScroll = true;
-      element.style.backgroundPosition = "0% 50%"; // Left-centered vertically
-    } else {
-      // Image is relatively taller or same aspect ratio as container -> prioritize vertical scroll
-      element.style.backgroundSize = `${containerWidth}px auto`; // Fit width
-      imageRenderedWidth = containerWidth;
-      imageRenderedHeight =
-        (img.naturalHeight / img.naturalWidth) * containerWidth;
-      scrollableDimension = imageRenderedHeight - containerHeight;
-      isHorizontalScroll = false;
-      element.style.backgroundPosition = "50% 0%"; // Top-centered horizontally
-    }
+  // Determine if we need horizontal or vertical scroll, or just centering
+  if (imageAspectRatio > containerAspectRatio) {
+    // Image is relatively wider than the container -> prioritize horizontal scroll
+    element.style.backgroundSize = `auto ${containerHeight}px`; // Fit height
+    imageRenderedWidth = (img.naturalWidth / img.naturalHeight) * containerHeight;
+    imageRenderedHeight = containerHeight;
+    scrollableDimension = imageRenderedWidth - containerWidth;
+    isHorizontalScroll = true;
+    element.style.backgroundPosition = "0% 50%"; // Left-centered vertically
+  } else {
+    // Image is relatively taller or same aspect ratio as container -> prioritize vertical scroll
+    element.style.backgroundSize = `${containerWidth}px auto`; // Fit width
+    imageRenderedWidth = containerWidth;
+    imageRenderedHeight = (img.naturalHeight / img.naturalWidth) * containerWidth;
+    scrollableDimension = imageRenderedHeight - containerHeight;
+    isHorizontalScroll = false;
+    element.style.backgroundPosition = "50% 0%"; // Top-centered horizontally
+  }
 
-    if (scrollableDimension <= 0) {
-      // If no scrolling is needed, just center the image
-      element.style.backgroundPosition = "center center";
-      return;
-    }
+  if (scrollableDimension <= 0) {
+    // If no scrolling is needed, just center the image
+    element.style.backgroundPosition = "center center";
+    return;
+  }
 
-    const scrollSpeed = 0.005; // Pixels per millisecond (half of original)
-    let currentScroll; // Declare without initializing here
-    let lastTimestamp = null;
-    let scrollDirection; // Declare without initializing here
+  const scrollSpeed = 0.005; // Pixels per millisecond (half of original)
+  let currentScroll; // Declare without initializing here
+  let lastTimestamp = null;
+  let scrollDirection; // Declare without initializing here
 
-    // Initialize currentScroll and scrollDirection based on scroll type
-    if (!isHorizontalScroll) {
-      // If it's a vertical image that scrolls
-      currentScroll = Math.max(0, scrollableDimension / 2); // Directly in the center
-      scrollDirection = -1; // Start by scrolling "down" (currentScroll decreases)
-    } else {
-      // For horizontal images, start at the beginning
-      currentScroll = 0;
-      scrollDirection = 1; // Start by scrolling "right" (currentScroll increases)
-    }
+  // Initialize currentScroll and scrollDirection based on scroll type
+  if (!isHorizontalScroll) {
+    // If it's a vertical image that scrolls
+    currentScroll = Math.max(0, scrollableDimension / 2); // Directly in the center
+    scrollDirection = -1; // Start by scrolling "down" (currentScroll decreases)
+  } else {
+    // For horizontal images, start at the beginning
+    currentScroll = 0;
+    scrollDirection = 1; // Start by scrolling "right" (currentScroll increases)
+  }
 
-    const delayDuration = 1000; // 1 second delay at the edges
-    let delayStartTime = null; // Tracks when the delay started
+  const delayDuration = 1000; // 1 second delay at the edges
+  let delayStartTime = null; // Tracks when the delay started
 
-    function animateAutoscroll(timestamp) {
-      if (!lastTimestamp) lastTimestamp = timestamp;
-      const deltaTime = timestamp - lastTimestamp;
-      lastTimestamp = timestamp;
+  function animateAutoscroll(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    const deltaTime = timestamp - lastTimestamp;
+    lastTimestamp = timestamp;
 
-      // Handle delay at edges
-      if (delayStartTime !== null) {
-        if (timestamp - delayStartTime < delayDuration) {
-          // Still in delay, request next frame without updating scroll
-          setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
-          return;
-        } else {
-          // Delay finished, clear delayStartTime
-          delayStartTime = null;
-        }
-      }
-
-      currentScroll += scrollSpeed * deltaTime * scrollDirection;
-
-      // Reverse direction if boundaries are reached
-      let boundaryHit = false;
-      if (currentScroll >= scrollableDimension) {
-        currentScroll = scrollableDimension; // Snap to boundary
-        scrollDirection = -1;
-        boundaryHit = true;
-      } else if (currentScroll <= 0) {
-        currentScroll = 0; // Snap to boundary
-        scrollDirection = 1;
-        boundaryHit = true;
-      }
-
-      if (boundaryHit) {
-        delayStartTime = timestamp; // Start delay
-      }
-
-      if (isHorizontalScroll) {
-        element.style.backgroundPositionX = `-${currentScroll}px`;
+    // Handle delay at edges
+    if (delayStartTime !== null) {
+      if (timestamp - delayStartTime < delayDuration) {
+        // Still in delay, request next frame without updating scroll
+        setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
+        return;
       } else {
-        element.style.backgroundPositionY = `-${currentScroll}px`;
+        // Delay finished, clear delayStartTime
+        delayStartTime = null;
       }
+    }
 
-      setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
+    currentScroll += scrollSpeed * deltaTime * scrollDirection;
+
+    // Reverse direction if boundaries are reached
+    let boundaryHit = false;
+    if (currentScroll >= scrollableDimension) {
+      currentScroll = scrollableDimension; // Snap to boundary
+      scrollDirection = -1;
+      boundaryHit = true;
+    } else if (currentScroll <= 0) {
+      currentScroll = 0; // Snap to boundary
+      scrollDirection = 1;
+      boundaryHit = true;
+    }
+
+    if (boundaryHit) {
+      delayStartTime = timestamp; // Start delay
+    }
+
+    if (isHorizontalScroll) {
+      element.style.backgroundPositionX = `-${currentScroll}px`;
+    } else {
+      element.style.backgroundPositionY = `-${currentScroll}px`;
     }
 
     setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
-  };
+  }
 
-  img.onerror = () => {
-    console.error("Failed to load image for autoscroll:", imageUrl);
-    element.style.backgroundImage = "none";
-    element.style.display = "none";
-  };
+  setCurrentAnimationFrameId(requestAnimationFrame(animateAutoscroll));
 }
 
 // Renamed from fetchImageSrc and modified to fetch more info
@@ -475,7 +466,7 @@ export function displayError(title, message) {
  * Displays the Picture of the Day data on the page.
  * @param {object} potdData The data for the Picture of the Day.
  */
-export function displayPicture(potdData) {
+export async function displayPicture(potdData) {
   setCurrentPotdData(potdData); // Store the current POTD data globally
   // Store new title and article URL immediately
   potdTitleElement.innerHTML = potdData.title;
@@ -551,25 +542,24 @@ export function displayPicture(potdData) {
     const img = new Image();
     img.src = potdData.url;
 
-    img.onload = () => {
-      // Once new image is loaded, swap
+    try {
+      await img.decode(); // Asynchronously decode the image
+      // Once new image is decoded and loaded, swap
       backgroundVideoElement.pause();
       backgroundVideoElement.style.display = "none"; // Hide video if it was showing
       document.body.style.setProperty("--image-url", "none"); // Clear body background if sharpImageElement is taking over
-      sharpImageElement.style.display = "block";
-      startBackgroundAutoscroll(potdData.url, sharpImageElement); // Start autoscroll
-    };
-
-    img.onerror = () => {
-      console.error("Failed to load image:", potdData.url);
+      sharpImageElement.style.display = "block"; // Ensure sharpImageElement is visible before autoscroll
+      startBackgroundAutoscroll(img, sharpImageElement); // Pass the loaded image object
+    } catch (error) {
+      console.error("Failed to decode image:", potdData.url, error);
       // On error, revert to previous state or show generic error
       document.body.style.setProperty("--image-url", "none"); // Clear background image variable
       backgroundVideoElement.style.display = "none";
       sharpImageElement.style.display = "none";
       displayError(
         "Image Load Error",
-        `Could not load the image for ${userDisplayDateString}.`,
+        `Could not load or decode the image for ${userDisplayDateString}.`,
       );
-    };
+    }
   }
 }
