@@ -81,7 +81,7 @@ body {
   left: 20px;
   right: 20px; /* Make it span the entire bottom width */
   display: grid;
-  grid-template-columns: max-content max-content 1fr minmax(max-content, 50%); /* Date, Mode, Gap, Title (max 50%) */
+  grid-template-columns: max-content max-content 1fr auto; /* Date, Mode, Gap, Title (auto width, respects max-width of item) */
   align-items: center;
   gap: 20px;
   z-index: 3;
@@ -94,8 +94,7 @@ body {
   background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
   backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%); /* Enhanced liquid glass effect */
   border: var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  padding: 10px 15px;
+  padding: 11.6px 15px;
   border-radius: 12px; /* Consistent border radius */
   color: var(--text-color);
   font-size: 16px;
@@ -126,7 +125,7 @@ body {
   font-family: "Lora", serif;
   font-style: italic;
   font-size: 16px; /* Matched font size to #date-navigation-container */
-  padding: 10px 15px; /* Add padding to buttons themselves */
+  padding: 11.6px 15px; /* Add padding to buttons themselves */
   border-radius: 8px; /* Keep button specific border-radius */
   cursor: pointer;
   transition: color 0.2s ease-in-out; /* Transition text color */
@@ -168,7 +167,7 @@ body {
   grid-column: 4; /* Explicitly place in the fourth column */
   text-align: right;
   /* margin-left: auto; removed as 1fr gap handles spacing */
-  padding: 10px 15px;
+  padding: 12.25px 15px;
   background: linear-gradient(135deg, var(--glass-bg), var(--glass-highlight));
   backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(100%);
   border-radius: 12px;

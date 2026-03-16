@@ -1,0 +1,4 @@
+- flip flop between wikipedia and wikimedia at end of scroll
+- crossfade between images instead of hard cutting
+- when resizing page, there is a "failed to load" bug and the photo goes away
+- support other new video format
