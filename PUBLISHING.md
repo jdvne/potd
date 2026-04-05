@@ -4,34 +4,14 @@
 
 - Google account
 - $5 one-time Chrome Web Store developer registration fee
-- PNG icons at 16×16, 48×48, and 128×128 (required by the store; 128×128 also appears on the store listing page)
-- At least one 1280×800 or 640×400 screenshot for the store listing
+- PNG icons at 16×16, 32×32, 48×48, 64×64, and 128×128 (in `icons/`)
+- At least one 1280×800 or 640×400 screenshot (save in `store/screenshots/`)
+
+Store listing copy, description, keywords, and screenshot/promotional image specs are in [`store/listing.md`](store/listing.md).
 
 ---
 
-## 1. Create Icons
-
-The extension currently has no icon files. Create three PNGs and place them in the repo root:
-
-```
-icon16.png   (16×16)
-icon48.png   (48×48)
-icon128.png  (128×128)
-```
-
-Then add them to `manifest.json`:
-
-```json
-"icons": {
-  "16":  "icon16.png",
-  "48":  "icon48.png",
-  "128": "icon128.png"
-}
-```
-
----
-
-## 2. Register as a Developer
+## 1. Register as a Developer
 
 1. Go to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
 2. Sign in with your Google account
@@ -39,9 +19,9 @@ Then add them to `manifest.json`:
 
 ---
 
-## 3. Package the Extension
+## 2. Package the Extension
 
-The Chrome Web Store expects a `.zip` of the extension files. Do **not** include dev files like `README.md`, `PUBLISHING.md`, `GEMINI.md`, `TODO.md`, or `.git/`.
+The Chrome Web Store expects a `.zip` of the extension files. Do **not** include dev files like `README.md`, `PUBLISHING.md`, `GEMINI.md`, `TODO.md`, `store/`, or `.git/`.
 
 From the repo root:
 
@@ -57,43 +37,36 @@ zip -r potd.zip \
   main.js \
   media-display.js \
   state.js \
-  icon16.png \
-  icon48.png \
-  icon128.png
+  icons/
 ```
 
 ---
 
-## 4. Submit to the Chrome Web Store
+## 3. Submit to the Chrome Web Store
 
 1. In the Developer Dashboard, click **New item**
 2. Upload `potd.zip`
-3. Fill in the store listing:
-   - **Name:** Wikipedia Picture of the Day
-   - **Summary** (132 chars max): Replaces your new tab with Wikipedia's featured Picture of the Day — a different photo, painting, or illustration every day.
-   - **Description:** expand on the summary; mention daily updates, Wikipedia sourcing, and the full-viewport display
-   - **Category:** Lifestyle or Photos
-   - **Language:** English
-4. Upload screenshots (at least one 1280×800 or 640×400)
+3. Fill in the store listing using the copy in [`store/listing.md`](store/listing.md)
+4. Upload screenshots from `store/screenshots/`
 5. Set the **Single purpose** field: "Replaces the new tab page with Wikipedia's Picture of the Day"
 
 ---
 
-## 5. Privacy & Permissions Justification
+## 4. Privacy & Permissions Justification
 
 The store will ask you to justify each permission:
 
 | Permission | Justification |
 |---|---|
 | `storage` | Saves the cached image and date so the same image is not re-fetched within the same day |
-| `host_permissions: *.wikimedia.org` | Fetches the POTD Atom feed and image files from Wikimedia Commons |
+| `host_permissions: *.wikimedia.org` | Fetches the POTD image and metadata from Wikimedia Commons |
 | `host_permissions: *.wikipedia.org` | Fetches supplementary article metadata from the Wikipedia API |
 
 You will also need to complete a **privacy practices** declaration. This extension collects no user data and makes no external requests except to Wikimedia/Wikipedia.
 
 ---
 
-## 6. Review & Publication
+## 5. Review & Publication
 
 - Submit for review. Initial reviews typically take a few days.
 - Google may request changes to the description or permissions justification — respond promptly in the dashboard.

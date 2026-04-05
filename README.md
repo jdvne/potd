@@ -38,3 +38,9 @@ To use or develop this extension, you'll need to load it as an unpacked extensio
     -   Open a new tab in your browser. You should see your custom new tab page instead of the default one.
 
 For more technical details on the project structure, modularization, and development specifics, please refer to [GEMINI.md](GEMINI.md).
+
+## License
+
+The extension's source code is licensed under the **GNU General Public License v3.0** (GPL-3.0). See the [LICENSE](LICENSE) file for the full text. In short: you are free to use, modify, and distribute this code, but any derivative works must also be released under the GPL-3.0.
+
+The **content displayed by this extension** — images, videos, and descriptions — is fetched from Wikipedia and Wikimedia Commons via their public APIs. That content is owned by its respective authors and is published under various **Creative Commons licenses** (most commonly [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)). The extension displays attribution information as provided by the Wikimedia API. This extension is not affiliated with or endorsed by the Wikimedia Foundation.
