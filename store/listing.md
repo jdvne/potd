@@ -24,7 +24,7 @@ Features:
 Content is sourced directly from Wikimedia Commons via the official public API and is attributed to its original authors. This extension is not affiliated with or endorsed by the Wikimedia Foundation.
 
 ## Category
-Lifestyle  *(alternatively: Photos)*
+Art & Design
 
 ## Language
 English
