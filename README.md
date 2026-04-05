@@ -39,6 +39,16 @@ To use or develop this extension, you'll need to load it as an unpacked extensio
 
 For more technical details on the project structure, modularization, and development specifics, please refer to [GEMINI.md](GEMINI.md).
 
+## Building
+
+To package the extension for distribution, run the build script from the repo root:
+
+```bash
+./build.sh
+```
+
+This produces `build/potd-v{version}.zip` containing only the files needed for distribution. The version is read automatically from `manifest.json`. The `build/` folder is gitignored and will never be committed.
+
 ## License
 
 The extension's source code is licensed under the **GNU General Public License v3.0** (GPL-3.0). See the [LICENSE](LICENSE) file for the full text. In short: you are free to use, modify, and distribute this code, but any derivative works must also be released under the GPL-3.0.

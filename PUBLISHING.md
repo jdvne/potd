@@ -21,24 +21,15 @@ Store listing copy, description, keywords, and screenshot/promotional image spec
 
 ## 2. Package the Extension
 
-The Chrome Web Store expects a `.zip` of the extension files. Do **not** include dev files like `README.md`, `PUBLISHING.md`, `GEMINI.md`, `TODO.md`, `store/`, or `.git/`.
-
-From the repo root:
+From the repo root, run the build script:
 
 ```bash
-zip -r potd.zip \
-  manifest.json \
-  new_tab.html \
-  new_tab.css \
-  api.js \
-  date-utils.js \
-  dom-elements.js \
-  event-handlers.js \
-  main.js \
-  media-display.js \
-  state.js \
-  icons/
+./build.sh
 ```
+
+This produces `build/potd-v{version}.zip` containing only distribution files, with the version number read automatically from `manifest.json`. Dev files (`README.md`, `PUBLISHING.md`, `store/`, etc.) are excluded. The `build/` folder is gitignored and will never be committed.
+
+Before submitting, bump the `version` field in `manifest.json` if this is an update (e.g. `"1.0"` → `"1.1"`), then re-run `./build.sh`.
 
 ---
 
@@ -77,7 +68,7 @@ You will also need to complete a **privacy practices** declaration. This extensi
 ## Updating the Extension
 
 1. Bump the `version` field in `manifest.json` (e.g. `"1.0"` → `"1.1"`)
-2. Repackage with the zip command above
+2. Run `./build.sh`
 3. In the Developer Dashboard, open the existing item → **Package** → **Upload new package**
 4. Submit for review
 
