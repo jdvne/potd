@@ -22,15 +22,23 @@ Store listing copy, description, keywords, and screenshot/promotional image spec
 
 ## 2. Package the Extension
 
-From the repo root, run the build script:
+Releases are built automatically by GitHub Actions when a version tag is pushed.
 
+1. Bump the `version` field in `manifest.json` (e.g. `"1.0"` → `"1.1"`)
+2. Commit the change
+3. Tag and push:
+```bash
+git tag v1.0
+git push origin v1.0
+```
+
+GitHub Actions will run `build.sh` and publish a release at the repo's Releases page with the zip attached. Download the zip from there to submit to the store.
+
+To build locally instead:
 ```bash
 ./build.sh
 ```
-
-This produces `build/potd-v{version}.zip` containing only distribution files, with the version number read automatically from `manifest.json`. Dev files (`README.md`, `PUBLISHING.md`, `store/`, etc.) are excluded. The `build/` folder is gitignored and will never be committed.
-
-Before submitting, bump the `version` field in `manifest.json` if this is an update (e.g. `"1.0"` → `"1.1"`), then re-run `./build.sh`.
+This produces `build/potd-v{version}.zip`. The `build/` folder is gitignored and will never be committed.
 
 ---
 
@@ -70,9 +78,10 @@ You will also need to complete a **privacy practices** declaration. This extensi
 ## Updating the Extension
 
 1. Bump the `version` field in `manifest.json` (e.g. `"1.0"` → `"1.1"`)
-2. Run `./build.sh`
-3. In the Developer Dashboard, open the existing item → **Package** → **Upload new package**
-4. Submit for review
+2. Commit, tag, and push (see Step 2 above) — GitHub Actions will build and publish the release automatically
+3. Download the zip from the repo's Releases page
+4. In the Developer Dashboard, open the existing item → **Package** → **Upload new package**
+5. Submit for review
 
 ---
 
