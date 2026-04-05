@@ -55,13 +55,15 @@ This produces `build/potd-v{version}.zip`. The `build/` folder is gitignored and
 
 ## 4. Privacy & Permissions Justification
 
-The store will ask you to justify each permission:
+The store will ask you to justify each permission. Copy the text below directly into the submission form.
 
-| Permission | Justification |
-|---|---|
-| `storage` | Saves the cached image and date so the same image is not re-fetched within the same day |
-| `host_permissions: *.wikimedia.org` | Fetches the POTD image and metadata from Wikimedia Commons |
-| `host_permissions: *.wikipedia.org` | Fetches supplementary article metadata from the Wikipedia API |
+**Storage justification** *(1000 char max)*:
+> Stores the date of the last fetched Picture of the Day so the extension can avoid redundant API requests and display cached content when the same date is revisited within a session.
+
+**Host permission justification** *(1000 char max)*:
+> This extension fetches the daily Picture of the Day from the Wikimedia Commons Atom feed (wikimedia.org) and supplementary article metadata from the Wikipedia API (wikipedia.org). These are the sole external requests made by the extension. No user data is transmitted.
+
+**Remote code:** No
 
 You will also need to complete a **privacy practices** declaration. This extension collects no user data and makes no external requests except to Wikimedia/Wikipedia.
 
