@@ -5,7 +5,8 @@
 - Google account
 - $5 one-time Chrome Web Store developer registration fee
 - PNG icons at 16×16, 32×32, 48×48, 64×64, and 128×128 (in `icons/`)
-- At least one 1280×800 or 640×400 screenshot (save in `store/screenshots/`)
+- At least one 1280×800 or 640×400 screenshot (in `store/screenshots/`)
+- Small promotional tile 440×280 PNG (in `store/promotional/`)
 
 Store listing copy, description, keywords, and screenshot/promotional image specs are in [`store/listing.md`](store/listing.md).
 
@@ -39,7 +40,8 @@ Before submitting, bump the `version` field in `manifest.json` if this is an upd
 2. Upload `potd.zip`
 3. Fill in the store listing using the copy in [`store/listing.md`](store/listing.md)
 4. Upload screenshots from `store/screenshots/`
-5. Set the **Single purpose** field: "Replaces the new tab page with Wikipedia's Picture of the Day"
+5. Upload the small promotional tile from `store/promotional/tile_small.png`
+6. Set the **Single purpose** field: "Replaces the new tab page with Wikipedia's Picture of the Day"
 
 ---
 

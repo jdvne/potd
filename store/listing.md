@@ -40,14 +40,15 @@ wikipedia, picture of the day, new tab, photo, wikimedia, daily image, art, natu
 ---
 
 ## Screenshots
-Place 1280×800 or 640×400 PNG screenshots in `store/screenshots/`.
-At least one is required. Aim for 3–5 showing:
-1. A photo POTD filling the screen
-2. The info overlay with title + description visible
-3. A video/animated POTD (if available)
-4. The back-navigation in use
+Located in `store/screenshots/`. The store requires at least one, maximum five, at 1280×800 or 640×400.
 
-## Promotional Images (optional but recommended)
-- Small tile: 440×280 PNG → `store/promotional/tile_small.png`
-- Large tile: 920×680 PNG → `store/promotional/tile_large.png`
-- Marquee: 1400×560 PNG → `store/promotional/tile_marquee.png`
+Current screenshots:
+1. `screenshot-1.png` — photo POTD filling the screen
+2. `screenshot-2.png` — info overlay with title + description visible
+3. `screenshot-3.png` — back-navigation in use
+4. `screenshot-4.png` — additional POTD example
+
+## Promotional Images
+- **Small tile (recommended):** 440×280 PNG → `store/promotional/tile_small.png` ✓
+- Large tile (optional): 920×680 PNG → `store/promotional/tile_large.png`
+- Marquee (optional, only used if featured by Google): 1400×560 PNG → `store/promotional/tile_marquee.png`
