@@ -1,6 +1,10 @@
 # Wikipedia Picture of the Day
 
+[![store promotional tile](store/promotional/tile_small.png)](#)
+
 A Chrome extension that replaces your new tab page with the Wikipedia Picture of the Day — a full-viewport display of the image or video chosen daily by Wikipedia's editors, with context, navigation, and a link to the full article.
+
+![Extension screenshot](store/screenshots/screenshot-1.png)
 
 ---
 
@@ -20,6 +24,8 @@ A Chrome extension that replaces your new tab page with the Wikipedia Picture of
 
 ### From the Chrome Web Store
 *(Coming soon)*
+
+![Extension screenshot](store/screenshots/screenshot-2.png)
 
 ### Load Locally (Developer Mode)
 
