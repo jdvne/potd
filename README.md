@@ -39,15 +39,18 @@ To use or develop this extension, you'll need to load it as an unpacked extensio
 
 For more technical details on the project structure, modularization, and development specifics, please refer to [GEMINI.md](GEMINI.md).
 
-## Building
+## Building and Distributing
 
-To package the extension for distribution, run the build script from the repo root:
+Releases are built automatically by GitHub Actions — pushing a version tag triggers a build and publishes the zip as a GitHub Release:
 
 ```bash
-./build.sh
+git tag v1.0
+git push origin v1.0
 ```
 
-This produces `build/potd-v{version}.zip` containing only the files needed for distribution. The version is read automatically from `manifest.json`. The `build/` folder is gitignored and will never be committed.
+To build locally instead, run `./build.sh` from the repo root. This produces `build/potd-v{version}.zip` with the version read automatically from `manifest.json`. The `build/` folder is gitignored and will never be committed.
+
+For full instructions on submitting to the Chrome Web Store, see [PUBLISHING.md](PUBLISHING.md).
 
 ## License
 

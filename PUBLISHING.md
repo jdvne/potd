@@ -45,7 +45,7 @@ This produces `build/potd-v{version}.zip`. The `build/` folder is gitignored and
 ## 3. Submit to the Chrome Web Store
 
 1. In the Developer Dashboard, click **New item**
-2. Upload `potd.zip`
+2. Upload the zip from the repo's [Releases page](../../releases) (or from `build/` if built locally)
 3. Fill in the store listing using the copy in [`store/listing.md`](store/listing.md)
 4. Upload screenshots from `store/screenshots/`
 5. Upload the small promotional tile from `store/promotional/tile_small.png`
@@ -87,6 +87,4 @@ You will also need to complete a **privacy practices** declaration. This extensi
 
 ## Loading Locally (no account needed)
 
-1. Go to `chrome://extensions`
-2. Enable **Developer mode** (top right toggle)
-3. Click **Load unpacked** and select the repo folder
+See the Setup Instructions in [README.md](README.md) for how to load the extension as an unpacked extension during development.
