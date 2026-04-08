@@ -70,9 +70,6 @@ Edge requires a dedicated logo image at 300×300 (min 128×128), 1:1 aspect rati
 
 ## Chrome — Permission Justifications
 
-**Storage** *(1000 char max)*:
-> Stores the date of the last fetched Picture of the Day so the extension can avoid redundant API requests and display cached content when the same date is revisited within a session.
-
 **Host permissions** *(1000 char max)*:
 > This extension fetches the daily Picture of the Day from the Wikimedia Commons Atom feed (wikimedia.org) and supplementary article metadata from the Wikipedia API (wikipedia.org). These are the sole external requests made by the extension. No user data is transmitted.
 

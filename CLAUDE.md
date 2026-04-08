@@ -95,7 +95,6 @@ User navigates / page loads
 
 | Permission | Purpose |
 |---|---|
-| `storage` | Cache the current POTD date and data to avoid redundant fetches |
 | `*.wikimedia.org` | Fetch the POTD Atom feed and image files from Wikimedia Commons |
 | `*.wikipedia.org` | Fetch article metadata from the Wikipedia API |
 

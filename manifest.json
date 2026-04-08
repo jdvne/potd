@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Wikipedia Picture of the Day",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Displays the Wikipedia Picture of the Day in a new tab.",
   "chrome_url_overrides": {
     "newtab": "new_tab.html"
@@ -13,9 +13,6 @@
     "64":  "icons/icon64.png",
     "128": "icons/icon128.png"
   },
-  "permissions": [
-    "storage"
-  ],
   "host_permissions": [
     "*://*.wikimedia.org/*",
     "*://*.wikipedia.org/*"
