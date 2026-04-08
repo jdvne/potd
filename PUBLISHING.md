@@ -55,7 +55,7 @@ This produces `build/potd-v{version}.zip`. The `build/` folder is gitignored and
 
 1. Go to [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/public/login?ref=dd) and register if needed
 2. Click **Create new extension** and upload the zip
-3. Fill in availability (Public, all markets), properties, and store listing using [`store/listing.md`](store/listing.md)
+3. Fill in availability (Public, all markets), properties (category: Photos), and store listing using [`store/listing.md`](store/listing.md)
 4. Upload screenshots from `store/screenshots/`, the promotional tile from `store/promotional/`, and the extension logo
 5. Add certification notes from [`store/listing.md`](store/listing.md) on the submission page
 6. Submit for review — up to 7 business days
