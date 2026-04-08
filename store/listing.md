@@ -65,3 +65,23 @@ Both stores use the same small tile size — reuse the same asset.
 
 ## Extension Logo (Edge only)
 Edge requires a dedicated logo image at 300×300 (min 128×128), 1:1 aspect ratio. `icons/icon128.png` can be used if it reads well at that size, or create `store/promotional/logo_300.png`.
+
+---
+
+## Chrome — Permission Justifications
+
+**Storage** *(1000 char max)*:
+> Stores the date of the last fetched Picture of the Day so the extension can avoid redundant API requests and display cached content when the same date is revisited within a session.
+
+**Host permissions** *(1000 char max)*:
+> This extension fetches the daily Picture of the Day from the Wikimedia Commons Atom feed (wikimedia.org) and supplementary article metadata from the Wikipedia API (wikipedia.org). These are the sole external requests made by the extension. No user data is transmitted.
+
+**Remote code:** No
+
+**Privacy practices:** This extension collects no user data and makes no external requests except to Wikimedia/Wikipedia.
+
+---
+
+## Edge — Certification Notes
+
+> This extension replaces the new tab page with the Wikipedia Picture of the Day, fetched from the Wikimedia Commons public API. No user accounts, logins, or personal data are involved. Navigation arrows and keyboard left/right keys allow browsing past entries.
