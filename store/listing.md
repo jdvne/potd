@@ -27,7 +27,7 @@ Content is sourced directly from Wikimedia Commons via the official public API a
 
 ## Category
 - **Chrome:** Art & Design
-- **Edge:** Productivity *(Art & Design is not available on Edge)*
+- **Edge:** Photos
 
 ## Language
 English
