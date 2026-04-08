@@ -1,4 +1,6 @@
-# Chrome Web Store Listing
+# Store Listing
+
+This file contains copy for both the Chrome Web Store and Microsoft Edge Add-ons. Most content is shared — store-specific differences are noted where they apply.
 
 ## Name
 Wikipedia Picture of the Day
@@ -9,7 +11,7 @@ Wikipedia Picture of the Day
 Replaces your new tab with Wikipedia's featured Picture of the Day — a different photo, painting, or illustration every day.
 
 ## Description
-*(Plain text, 16,000 character max — paste this into the store listing form)*
+*(Plain text — Chrome max 16,000 chars, Edge min 250 / max 10,000 chars — paste from the raw file, not the rendered view)*
 
 Every time you open a new tab, discover a stunning image hand-picked by Wikipedia's editors as the Picture of the Day. From breathtaking nature photography to historic paintings to scientific imagery — a new visual every day.
 
@@ -24,7 +26,8 @@ Features:
 Content is sourced directly from Wikimedia Commons via the official public API and is attributed to its original authors. This extension is not affiliated with or endorsed by the Wikimedia Foundation.
 
 ## Category
-Art & Design
+- **Chrome:** Art & Design
+- **Edge:** Productivity *(Art & Design is not available on Edge)*
 
 ## Language
 English
@@ -36,6 +39,8 @@ Replaces the new tab page with Wikipedia's Picture of the Day.
 
 ## Tags / Keywords
 wikipedia, picture of the day, new tab, photo, wikimedia, daily image, art, nature, photography
+
+*(Edge allows max 7 terms / 21 words total)*
 
 ---
 
@@ -49,6 +54,14 @@ Current screenshots:
 4. `screenshot-4.png` — additional POTD example
 
 ## Promotional Images
-- **Small tile (recommended):** 440×280 PNG → `store/promotional/tile_small.png` ✓
-- Large tile (optional): 920×680 PNG → `store/promotional/tile_large.png`
-- Marquee (optional, only used if featured by Google): 1400×560 PNG → `store/promotional/tile_marquee.png`
+
+Both stores use the same small tile size — reuse the same asset.
+
+| Asset | Chrome | Edge | File |
+|---|---|---|---|
+| Small tile | 440×280 | 440×280 | `store/promotional/tile_small.png` ✓ |
+| Large tile | 920×680 | 1400×560 | *(not yet created — different sizes, needs two files)* |
+| Marquee/banner | 1400×560 | — | *(optional, Chrome only, only used if featured)* |
+
+## Extension Logo (Edge only)
+Edge requires a dedicated logo image at 300×300 (min 128×128), 1:1 aspect ratio. `icons/icon128.png` can be used if it reads well at that size, or create `store/promotional/logo_300.png`.
